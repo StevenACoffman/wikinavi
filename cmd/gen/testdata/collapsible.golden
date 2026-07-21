@@ -1,0 +1,45 @@
+<ul>
+  <li>&#128196; <a href="./getting-started">getting started</a></li>
+  <li>&#128196; <a href="./zebra">zebra</a></li>
+  <li>
+    <details open>
+      <summary>&#128193; guides</summary>
+      <ul>
+        <li>&#128196; <a href="./advanced_topics">advanced topics</a></li>
+        <li>&#128196; <a href="./intro">intro</a></li>
+        <li>
+          <details>
+            <summary>&#128193; setup</summary>
+            <ul>
+              <li>&#128196; <a href="./install">install</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+  </li>
+  <li>
+    <details open>
+      <summary>&#128193; reference</summary>
+      <ul>
+        <li>&#128196; <a href="./api">api</a></li>
+      </ul>
+    </details>
+  </li>
+  <li>
+    <details open>
+      <summary>&#128193; tips</summary>
+      <ul>
+        <li>&#128196; <a href="./tips:overview">overview</a></li>
+        <li>
+          <details>
+            <summary>&#128193; slos</summary>
+            <ul>
+              <li>&#128196; <a href="./tips:slos:intro">intro</a></li>
+            </ul>
+          </details>
+        </li>
+      </ul>
+    </details>
+  </li>
+</ul>

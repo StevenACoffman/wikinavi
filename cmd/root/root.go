@@ -15,8 +15,6 @@ import (
 // default "error: ..." printer.
 type ExitError int
 
-func (e ExitError) Error() string { return fmt.Sprintf("exit status %d", int(e)) }
-
 // Config holds shared I/O writers, shared flags, and the root ff.Command.
 // All subcommand configs embed *Config to inherit these. Logger is nil until
 // the dispatcher constructs it (post-parse, once Verbose is known) and assigns
@@ -30,6 +28,8 @@ type Config struct {
 	Flags   *ff.FlagSet
 	Command *ff.Command
 }
+
+func (e ExitError) Error() string { return fmt.Sprintf("exit status %d", int(e)) }
 
 // New returns a new root Config with the given I/O writers.
 func New(stdin io.Reader, stdout, stderr io.Writer) *Config {

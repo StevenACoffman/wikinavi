@@ -19,7 +19,6 @@ import (
 	"github.com/StevenACoffman/wikinavi/cmd/gen"
 	"github.com/StevenACoffman/wikinavi/cmd/root"
 	"github.com/StevenACoffman/wikinavi/cmd/version"
-	// climax:imports
 )
 
 // Run parses args and dispatches to the matching command.
