@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/peterbourgon/ff/v4"
+
 	"github.com/StevenACoffman/wikinavi/cmd"
 	"github.com/StevenACoffman/wikinavi/cmd/root"
 )
