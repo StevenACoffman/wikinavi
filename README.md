@@ -28,15 +28,26 @@ Then commit and push the changed pages to publish.
 
 ### Flags
 
-| Flag                | Effect                                                       |
-| ------------------- | ------------------------------------------------------------ |
-| `--collapsible`     | Render directories as collapsible `<details>` sections       |
-| `--disable-home`    | Skip injecting into `Home.md`                                 |
-| `--disable-sidebar` | Skip injecting into `_Sidebar.md`                             |
-| `-v`, `--verbose`   | Debug logging to stderr                                       |
+| Flag                 | Effect                                                                |
+| -------------------- | --------------------------------------------------------------------- |
+| `--collapsible`      | Render directories as collapsible `<details>` sections                |
+| `--disable-home`     | Skip injecting into `Home.md`                                          |
+| `--disable-sidebar`  | Skip injecting into `_Sidebar.md`                                      |
+| `--initialisms=LIST` | Comma-separated acronyms to upper-case in labels (e.g. `SLI,SLO,GCP`)  |
+| `-v`, `--verbose`    | Debug logging to stderr                                               |
 
 Every flag can also be set via a `WIKINAVI_`-prefixed environment variable
 (e.g. `WIKINAVI_COLLAPSIBLE=true`).
+
+### Labels
+
+A page's link label is derived from its filename: `-` and `_` become spaces, and
+each word is title-cased — except a word that already contains a capital is left
+untouched, so intentional casing survives (`AuditLogs-Designs.md` → "AuditLogs
+Designs", `SLOs-and-SLIs.md` → "SLOs And SLIs"). Recognized initialisms are
+upper-cased: Go's standard set (`API`, `HTTP`, `URL`, `ID`, ...) always, plus any
+you pass via `--initialisms` (`sli-basics.md` → "SLI Basics" with
+`--initialisms=SLI`).
 
 ## Folders in a flat wiki: the colon convention
 

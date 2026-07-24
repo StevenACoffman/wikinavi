@@ -1,17 +1,20 @@
 <ul>
-  <li>&#128196; <a href="./getting-started">getting started</a></li>
-  <li>&#128196; <a href="./zebra">zebra</a></li>
+  <li>&#128196; <a href="./AuditLogs-Designs">AuditLogs Designs</a></li>
+  <li>&#128196; <a href="./SLOs-and-SLIs">SLOs And SLIs</a></li>
+  <li>&#128196; <a href="./getting-started">Getting Started</a></li>
+  <li>&#128196; <a href="./zebra">Zebra</a></li>
   <li>
     <details open>
-      <summary>&#128193; guides</summary>
+      <summary>&#128193; Guides</summary>
       <ul>
-        <li>&#128196; <a href="./advanced_topics">advanced topics</a></li>
-        <li>&#128196; <a href="./intro">intro</a></li>
+        <li>&#128196; <a href="./advanced_topics">Advanced Topics</a></li>
+        <li>&#128196; <a href="./intro">Intro</a></li>
+        <li>&#128196; <a href="./sli-basics">SLI Basics</a></li>
         <li>
           <details>
-            <summary>&#128193; setup</summary>
+            <summary>&#128193; Setup</summary>
             <ul>
-              <li>&#128196; <a href="./install">install</a></li>
+              <li>&#128196; <a href="./install">Install</a></li>
             </ul>
           </details>
         </li>
@@ -20,22 +23,22 @@
   </li>
   <li>
     <details open>
-      <summary>&#128193; reference</summary>
+      <summary>&#128193; Reference</summary>
       <ul>
-        <li>&#128196; <a href="./api">api</a></li>
+        <li>&#128196; <a href="./api">API</a></li>
       </ul>
     </details>
   </li>
   <li>
     <details open>
-      <summary>&#128193; tips</summary>
+      <summary>&#128193; Tips</summary>
       <ul>
-        <li>&#128196; <a href="./tips:overview">overview</a></li>
+        <li>&#128196; <a href="./tips:overview">Overview</a></li>
         <li>
           <details>
-            <summary>&#128193; slos</summary>
+            <summary>&#128193; Slos</summary>
             <ul>
-              <li>&#128196; <a href="./tips:slos:intro">intro</a></li>
+              <li>&#128196; <a href="./tips:slos:intro">Intro</a></li>
             </ul>
           </details>
         </li>

@@ -1,28 +1,31 @@
 <ul>
-    <li><a href="./getting-started">getting started</a></li>
-    <li><a href="./zebra">zebra</a></li>
-    <li>guides
+    <li><a href="./AuditLogs-Designs">AuditLogs Designs</a></li>
+    <li><a href="./SLOs-and-SLIs">SLOs And SLIs</a></li>
+    <li><a href="./getting-started">Getting Started</a></li>
+    <li><a href="./zebra">Zebra</a></li>
+    <li>Guides
       <ul>
-        <li><a href="./advanced_topics">advanced topics</a></li>
-        <li><a href="./intro">intro</a></li>
-        <li>setup
+        <li><a href="./advanced_topics">Advanced Topics</a></li>
+        <li><a href="./intro">Intro</a></li>
+        <li><a href="./sli-basics">SLI Basics</a></li>
+        <li>Setup
           <ul>
-            <li><a href="./install">install</a></li>
+            <li><a href="./install">Install</a></li>
           </ul>
         </li>
       </ul>
     </li>
-    <li>reference
+    <li>Reference
       <ul>
-        <li><a href="./api">api</a></li>
+        <li><a href="./api">API</a></li>
       </ul>
     </li>
-    <li>tips
+    <li>Tips
       <ul>
-        <li><a href="./tips:overview">overview</a></li>
-        <li>slos
+        <li><a href="./tips:overview">Overview</a></li>
+        <li>Slos
           <ul>
-            <li><a href="./tips:slos:intro">intro</a></li>
+            <li><a href="./tips:slos:intro">Intro</a></li>
           </ul>
         </li>
       </ul>

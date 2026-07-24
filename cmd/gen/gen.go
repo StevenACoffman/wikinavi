@@ -14,7 +14,9 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"unicode"
 
+	"github.com/ettle/strcase"
 	"github.com/peterbourgon/ff/v4"
 
 	"github.com/StevenACoffman/wikinavi/cmd/root"
@@ -43,15 +45,16 @@ type Config struct {
 	DisableHome    bool
 	DisableSidebar bool
 	Collapsible    bool
+	Initialisms    string
 	Flags          *ff.FlagSet
 	Command        *ff.Command
 }
 
 // treeVisitor receives structural events as sorted paths are walked into a
 // directory tree. depth is the directory's index from the root (0 = top level).
-// enterDir/leaveDir bracket each directory (name is the deslugged display
-// label); file is called once per leaf with the flat wiki page name for its
-// href and the deslugged leaf label. The visitor owns all HTML and formatting
+// enterDir/leaveDir bracket each directory (name is the display label); file is
+// called once per leaf with the flat wiki page name for its href and the leaf's
+// display label. The visitor owns all HTML and formatting
 // (escaping, indentation); walkTree owns only the structure.
 type treeVisitor struct {
 	enterDir func(depth int, name string)
@@ -76,6 +79,13 @@ func New(parent *root.Config) *Config {
 		0,
 		"collapsible",
 		"render directories as collapsible <details> sections",
+	)
+	cfg.Flags.StringVar(
+		&cfg.Initialisms,
+		0,
+		"initialisms",
+		"",
+		"comma-separated extra initialisms to keep upper-cased in labels (e.g. SLI,SLO,GCP)",
 	)
 	cfg.Command = &ff.Command{
 		Name:      "gen",
@@ -126,11 +136,12 @@ func (cfg *Config) exec(ctx context.Context, args []string) error {
 	}
 	l.DebugContext(ctx, "collected markdown files", "count", len(files), "files", files)
 
+	caser := newCaser(cfg.Initialisms)
 	render := renderTree
 	if cfg.Collapsible {
 		render = renderCollapsibleTree
 	}
-	toc := render(files)
+	toc := render(caser, files)
 	l.DebugContext(ctx, "rendered table of contents", "toc", toc)
 
 	l.InfoContext(ctx, "injecting table of contents", "targets", targetFiles)
@@ -301,11 +312,50 @@ func sortForTree(paths []string) []string {
 	return out
 }
 
+// newCaser builds the label caser: Go's standard initialisms (API, HTTP, ID,
+// URL, ...) plus any extra comma-separated ones supplied via --initialisms
+// (e.g. "SLI,SLO,GCP"). Extra keys are upper-cased, so callers may pass them in
+// any case.
+func newCaser(extra string) *strcase.Caser {
+	overrides := map[string]bool{}
+	for _, s := range strings.Split(extra, ",") {
+		if s = strings.TrimSpace(s); s != "" {
+			overrides[strings.ToUpper(s)] = true
+		}
+	}
+	return strcase.NewCaser(true, overrides, nil)
+}
+
+// titleLabel converts a raw path segment into a display label. Words are split
+// on '-' and '_'; a word that already contains an uppercase letter is kept
+// verbatim, so intentional casing like "SLIs" or "AuditLogs" survives. An
+// all-lowercase word is title-cased, with recognized initialisms upper-cased
+// (e.g. "sli" -> "SLI", "api" -> "API").
+func titleLabel(caser *strcase.Caser, seg string) string {
+	words := strings.FieldsFunc(seg, func(r rune) bool { return r == '-' || r == '_' })
+	for i, w := range words {
+		if hasUpper(w) {
+			continue // preserve the author's intentional casing
+		}
+		words[i] = caser.ToCase(w, strcase.TitleCase, ' ')
+	}
+	return strings.Join(words, " ")
+}
+
+// hasUpper reports whether s contains any uppercase letter.
+func hasUpper(s string) bool {
+	for _, r := range s {
+		if unicode.IsUpper(r) {
+			return true
+		}
+	}
+	return false
+}
+
 // walkTree sorts paths files-first and drives v through the implied directory
 // tree. This is the traversal shared by every renderer; the renderers differ
 // only in the HTML their visitors emit.
-func walkTree(paths []string, v treeVisitor) {
-	deslug := strings.NewReplacer("-", " ", "_", " ")
+func walkTree(caser *strcase.Caser, paths []string, v treeVisitor) {
 	var stack []string // open directory segments (raw names, for prefix matching)
 	for _, p := range sortForTree(paths) {
 		segs := virtualSegments(p)
@@ -324,14 +374,14 @@ func walkTree(paths []string, v treeVisitor) {
 			v.leaveDir(i)
 		}
 		stack = stack[:common]
-		// Open each newly entered directory. Names are deslugged for display but
+		// Open each newly entered directory. Names become display labels but are
 		// kept raw on the stack so prefix matching stays exact.
 		for _, dir := range dirs[common:] {
-			v.enterDir(len(stack), deslug.Replace(dir))
+			v.enterDir(len(stack), titleLabel(caser, dir))
 			stack = append(stack, dir)
 		}
-		// Emit the leaf: real flat page name for the href, deslugged leaf label.
-		v.file(len(stack), hrefName(p), deslug.Replace(leaf))
+		// Emit the leaf: real flat page name for the href, leaf display label.
+		v.file(len(stack), hrefName(p), titleLabel(caser, leaf))
 	}
 	// Close whatever remains open.
 	for i := len(stack) - 1; i >= 0; i-- {
@@ -349,7 +399,7 @@ func walkTree(paths []string, v treeVisitor) {
 // Ensures:  the output contains exactly one <a> per input path; hrefs are flat
 // ("./" + filename without extension); list nesting is balanced. An empty slice
 // returns "".
-func renderTree(paths []string) string {
+func renderTree(caser *strcase.Caser, paths []string) string {
 	if len(paths) == 0 {
 		return ""
 	}
@@ -361,7 +411,7 @@ func renderTree(paths []string) string {
 
 	var b strings.Builder
 	b.WriteString("<ul>\n")
-	walkTree(paths, treeVisitor{
+	walkTree(caser, paths, treeVisitor{
 		enterDir: func(depth int, name string) {
 			b.WriteString(liPad(depth) + "<li>" + html.EscapeString(name) + "\n")
 			b.WriteString(ulPad(depth) + "<ul>\n")
@@ -392,7 +442,7 @@ func renderTree(paths []string) string {
 // <li><details><summary>…</summary><ul>…</ul></details></li>; output begins with
 // "<ul>" at column 0 and contains no blank line (both required for GitHub to
 // treat the whole fragment as one raw-HTML block). An empty slice returns "".
-func renderCollapsibleTree(paths []string) string {
+func renderCollapsibleTree(caser *strcase.Caser, paths []string) string {
 	if len(paths) == 0 {
 		return ""
 	}
@@ -404,7 +454,7 @@ func renderCollapsibleTree(paths []string) string {
 
 	var b strings.Builder
 	b.WriteString("<ul>\n")
-	walkTree(paths, treeVisitor{
+	walkTree(caser, paths, treeVisitor{
 		enterDir: func(depth int, name string) {
 			openAttr := ""
 			if depth == 0 {

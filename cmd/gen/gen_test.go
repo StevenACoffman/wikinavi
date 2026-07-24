@@ -13,19 +13,29 @@ import (
 	"github.com/StevenACoffman/wikinavi/cmd/root"
 )
 
+// testInitialisms is the extra-initialism list the render tests pass, mirroring
+// what a caller would give via --initialisms.
+const testInitialisms = "SLI,SLO,GCP"
+
 var update = flag.Bool("update", false, "update golden files")
 
 // sampleInput is deliberately unsorted so the tests also exercise the
-// files-before-subdirectories ordering, and includes hyphen/underscore names to
-// exercise deslugging plus colon-encoded folders.
+// files-before-subdirectories ordering, and mixes naming styles to exercise
+// label casing: hyphen/underscore splitting, lowercase words (title-cased),
+// lowercase initialisms ("api" -> "API", "sli" -> "SLI"), preserved mixed-case
+// ("AuditLogs", "SLOs"/"SLIs"), and colon-encoded folders.
 func sampleInput() []string {
 	return []string{
 		"guides/advanced_topics.md",
 		"getting-started.md",
 		"guides/setup/install.md",
 		"guides/intro.md",
+		"guides/sli-basics.md",
 		"reference/api.md",
 		"zebra.md",
+		// Mixed-case names whose intentional casing must survive untouched.
+		"AuditLogs-Designs.md",
+		"SLOs-and-SLIs.md",
 		// Colon-encoded folders (flat GitHub-wiki filenames) mixed with real
 		// subdirectories, to exercise both structure sources together.
 		"tips:slos:intro.md",
@@ -46,9 +56,9 @@ func TestRender(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := gen.RenderTree(tc.paths)
+			got := gen.RenderTree(testInitialisms, tc.paths)
 			if tc.collapsible {
-				got = gen.RenderCollapsibleTree(tc.paths)
+				got = gen.RenderCollapsibleTree(testInitialisms, tc.paths)
 			}
 			checkGolden(t, name, got)
 			if len(tc.paths) > 0 {
